@@ -1,15 +1,52 @@
 ---
 - name: Configure nginx webserver
-  hosts: aws
+  hosts: gcp
   tasks:
-  - name: install httpd server
+  - name: update apt
     become: yes
-    become_user: root
-    yum:
-      name: httpd
-      state: latest
-  - name: start httpd server
-    shell:
-      "sudo systemctl start httpd"
+    become_method: sudo
+    apt:
+      update_cache=yes force_apt_get=yes cache_valid_time=3600
+  - name: Install nodejs and npm
+    become: yes
+    become_method: sudo
+    apt:
+      pkg:
+        - nodejs
+        - npm
+#another play
+- name: Deploy nodejs app
+  hosts: gcp
+  vars:
+    - location: /home/abdullah.cloud001
+
+  tasks:
+    - name: Copy nodejs folder to a server
+      copy:
+        src: ~/Desktop/nodejs-app-1.0.0.tgz
+        dest: {{location}}/app-1.0.0.tgz
+    - name: Unpack the node tar
+      unarchive:
+        src: /home/abdullah.cloud001/app-1.0.0.tgz
+        dest: /home/abdullah.cloud001
+        remote_src: yes
+    - name: Install dependencies
+      npm:
+        path: /home/abdullah.cloud001/package
+    - name: Start the application
+      command: node /home/abdullah.cloud001/package/app/server
+      async: 1000
+      poll: 0   #0 means you want to move on to next task without waiting for the result of this task
+    - name: Ensure the app is running
+      shell: ps aux | grep node
+      register: app_status
+    - debug: msg={{app_status}}
+
+
+
+
+
+
+
       
       

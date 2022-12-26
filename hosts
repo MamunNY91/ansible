@@ -1,6 +1,14 @@
 [aws]
-44.201.57.163
+3.235.57.131
 [aws:vars]
 ansible_ssh_private_key_file=~/Desktop/testInstance.pem
 ansible_user=ec2-user
 ansible_python_interpreter=/usr/bin/python3.8
+
+[gcp]
+34.130.255.180
+[gcp:vars]
+ansible_ssh_private_key_file=~/Desktop/rsa_key
+ansible_user=abdullah.cloud001
+
+
